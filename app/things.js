@@ -76,8 +76,7 @@ class ThingItem {
 
         const content = sentence.slice(1, num);
         const parts = content.split('|');
-        console.log(parts)
-        
+                
         const item = new ThingItem(parts[1], null, parts[0]);
         for (let i = 2; i < parts.length; i++) {
             const [key, value] = parts[i].split(':', 2);
