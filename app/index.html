@@ -153,7 +153,7 @@
         </div>        
     </div>
 
-
+    <script src="script.js"></script>
     <script>
         // DOM Elements                
         const bleStateContainer = document.getElementById('lblState');
@@ -161,16 +161,18 @@
 
         //Define BLE Device Specs
         var deviceName ='Traffic-Light';
-        var bleServiceID = '53746172-6c69-6768-7400-100000000000';
-        var stateCharacteristicID = '53746172-6c69-6768-7400-200000000000';
-        var modeCharacteristicID = '53746172-6c69-6768-7400-200000000001';
+        var service_id = '0000180a-0000-1000-8000-00805f9b34fb';
         var tempCharacteristicID = 0x2A26;
-
+                                
+        var _UART_SERVICE_ID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+        var _UART_TX_ID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'  //RX on the other side
+        var _UART_RX_ID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'  // TX on the other side
+        
         //Global Variables to Handle Bluetooth
         var bleServer;
         var bleService;
-        var stateCharacteristic;
-        var modeCharacteristic;
+        var rx_attrib;
+        var tx_attrib;
 
         // CONNECTION BUTTONS
         var btnConnect = document.getElementById('btnConnect');
@@ -229,7 +231,7 @@
             console.log('Initializing Bluetooth...');
             navigator.bluetooth.requestDevice({
                 filters: [{name: deviceName}],
-                optionalServices: [bleServiceID]
+                optionalServices: [_UART_SERVICE_ID]
             })
             .then(device => {
                 console.log('Device Selected:', device.name);            
@@ -242,46 +244,26 @@
             .then(gattServer =>{
                 bleServer = gattServer;
                 console.log("Connected to GATT Server");
-                return bleServer.getPrimaryService(bleServiceID);
+                return bleServer.getPrimaryService(_UART_SERVICE_ID);
             })
             .then(service => {
                 bleService = service;
                 console.log("Service discovered:", service.uuid);
                 
-                // STATE
-                service.getCharacteristic(stateCharacteristicID)
+                // Receive (aka: TX on the server)
+                service.getCharacteristic(_UART_RX_ID)
                 .then(characteristic => {
-                    stateCharacteristic = characteristic
+                    rx_attrib = characteristic
 
-                    console.log("+ State Change Listener");
-                    stateCharacteristic.addEventListener('characteristicvaluechanged', state_changed);
-                    stateCharacteristic.startNotifications();               
-
-                    // Optionally read initial value
-                    stateCharacteristic.readValue().then(data => 
-                    {
-                        value = new TextDecoder().decode(data);
-                        console.log('Initial state value:', value);
-                        state_show(value);
-                    });
+                    console.log("+ RX Change Listener");
+                    rx_attrib.addEventListener('characteristicvaluechanged', uart_received);
+                    rx_attrib.startNotifications();               
                 })
 
-                // MODE
-                service.getCharacteristic(modeCharacteristicID)
+                // TX
+                service.getCharacteristic(_UART_TX_ID)
                 .then(characteristic => {
-                    modeCharacteristic = characteristic
-
-                    console.log("+ Mode Change Listener");
-                    modeCharacteristic.addEventListener('characteristicvaluechanged', mode_changed);
-                    modeCharacteristic.startNotifications();               
-
-                    // Optionally read initial value
-                    modeCharacteristic.readValue().then(data => 
-                    {
-                        value = new TextDecoder().decode(data);
-                        console.log('Initial mode value:', value);
-                        mode_show(value);
-                    });
+                    tx_attrib = characteristic
                 })
             })        
             .catch(error => {
@@ -302,6 +284,8 @@
         // STATE METHODS
         function state_show(value) 
         {
+            if(value == undefined){ return }
+
             if(value == 'G'){ // GREEN
                 ledGreen.classList.add('on')
                 ledYellow.classList.remove('on')
@@ -324,6 +308,41 @@
             }
         } 
 
+        function uart_send(value)
+        {
+            if (!bleServer || !bleServer.connected) 
+            {
+                console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+                window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+                return;
+            }            
+
+            tx_attrib.writeValue(new TextEncoder().encode(value))
+            .then(() => {
+                console.log("UART Sent: ", value);
+            })
+            .catch(error => {
+                console.error("Error writing to the State characteristic: ", error);
+            }); 
+        }
+
+        function uart_received(event)
+        {            
+            value = new TextDecoder().decode(event.target.value);
+            console.log("UART Received: ", value);
+            
+            msg = TelemetryEvent.parse(value)
+
+            if('s' in msg.tags) {
+                state_show(msg.tags['s'])
+            }
+            if('m' in msg.tags) {
+                mode_show(msg.tags['m'])
+            }
+
+            timestampContainer.innerHTML = getDateTime();
+        }
+
         function state_send(value)
         {
             if (!bleServer || !bleServer.connected) 
@@ -333,28 +352,19 @@
                 return;
             }
 
-            stateCharacteristic.writeValue(new TextEncoder().encode(value))
-            .then(() => {
-                console.log("Value written to State Characteristic:", value);
-            })
-            .catch(error => {
-                console.error("Error writing to the State characteristic: ", error);
-            }); 
+            msg = new TelemetryEvent(type='s') 
+            msg.tags['s'] = value
+
+            uart_send(msg.sentence())
         }
 
-        function state_changed(event)
-        {            
-            value = new TextDecoder().decode(event.target.value);
-            console.log("State changed: ", value);
-            
-            state_show(value);
-            timestampContainer.innerHTML = getDateTime();
-        }
 
         // --------------------------------------------------------------------------------
         // MODE METHODS
         function mode_show(value) 
         {
+            if(value == undefined){ return }
+            
             if(value == 'O')
             {
                 this.rdoOff.checked = true
@@ -389,13 +399,10 @@
                 return;
             }
             
-            modeCharacteristic.writeValue(new TextEncoder().encode(value))
-            .then(() => {
-                console.log("Value written to State Characteristic:", value);
-            })
-            .catch(error => {
-                console.error("Error writing to the State characteristic: ", error);
-            });    
+            msg = new TelemetryEvent(type='s') 
+            msg.tags['m'] = value
+
+            uart_send(msg.sentence())
         }
 
         function mode_changed(event)
@@ -454,8 +461,8 @@
             console.log("Disconnecting Device...");
 
             // stop notifications
-            stateCharacteristic.stopNotifications()
-            modeCharacteristic.stopNotifications()
+            rx_attrib.stopNotifications()
+            tx_attrib.stopNotifications()
             console.log("Notifications Stopped");
 
             // disconnect from BLE server
