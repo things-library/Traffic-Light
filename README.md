@@ -83,9 +83,47 @@ CPU Temperature | 0x2a1c | | [X] | [X]
 
 The telemetry data that is transmitted from the BLE UART TX attribute is based on the [Things Library Telemetry](https://schema.thingslibrary.io/telemetry) protocol which is based on GPS data over NMEA 0183.   Telemetry sentences can be converted right into Things Library Telemetry Event objects which is a simple but powerful data structure.
 
-## Examples: 
+### State Sentences (Send or Receive)
+
+State sentences describe the current state of the device when receiving from the device.  When sending a state sentence to the device it tell the device what the desired state should be.
+
+Note: Sending a empty message of this type to the device will result in a populated sentence in response.
+
+|Tags|Description|
+|--|--|
+m|Mode (O = Off, A = Automatic, M = Manual, F = Flashing)
+t|Temperature (degrees celsius)
+s|State (G = Green, Y = Yellow, R = Red)
+d|Delay before state change (how long will it be in this state if on Auto)
+
+### Examples: 
 ```
 $801845240|s|m:A|t:26|s:G*17
 $801869353|s|m:A|t:23|s:Y*01
 $801869357|s|m:A|t:23|s:R*0E
 ```
+
+## Config Sentence (Send or Receive)
+
+Configuration sentences describe the settings of the device such as the the hex colors of each of the lights, if a change warning option is enabled, and yellow/amber light delay duration.
+
+Change Warning is similar to how a UK traffic light will turn on red and amber as a change warning that the light is about to change to green.
+
+Note: Sending a empty message of this type to the device will result in a populated sentence in response.
+
+|Tags|Description|
+|--|--|
+g|Hex code for green bottom light
+y|Hex code for yellow/amber middle light
+r|Hex code for red top light
+yd|Yellow light delay (miliseconds)
+cw|Change warning enabled (0 = disabled, 1 = enabled)
+
+
+### Examples: 
+```
+$801845240|c|g:0x00ff00|y:0xffff00|r:0xff0000|yd:350|cw:0*17
+```
+
+
+
