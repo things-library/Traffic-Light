@@ -94,13 +94,13 @@ Note: Sending a empty message of this type to the device will result in a popula
 m|Mode (O = Off, A = Automatic, M = Manual, F = Flashing)
 t|Temperature (degrees celsius)
 s|State (G = Green, Y = Yellow, R = Red)
-d|Delay before state change (how long will it be in this state if on Auto)
+x| Expires or Delay before state change (how long will it be in this state if on Auto)
 
 ### Examples: 
 ```
-$801845240|s|m:A|t:26|s:G*17
-$801869353|s|m:A|t:23|s:Y*01
-$801869357|s|m:A|t:23|s:R*0E
+$801845240|s|m:A|t:26|s:G|x:5440*17
+$801869353|s|m:A|t:23|s:Y|x:3500*01
+$801869357|s|m:A|t:23|s:R|x:870*0E
 ```
 
 ## Config Sentence (Send or Receive)
@@ -117,12 +117,12 @@ g|Hex code for green bottom light
 y|Hex code for yellow/amber middle light
 r|Hex code for red top light
 yd|Yellow light delay (miliseconds)
-cw|Change warning enabled (0 = disabled, 1 = enabled)
+w|Change warning enabled (0 = disabled, 1 = enabled)
 
 
 ### Examples: 
 ```
-$801845240|c|g:0x00ff00|y:0xffff00|r:0xff0000|yd:350|cw:0*17
+$801845240|c|g:0x00ff00|y:0xffff00|r:0xff0000|yd:3500|w:0*17
 ```
 
 
