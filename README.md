@@ -23,6 +23,7 @@ When device is plugged in it will automatically assume a standard stop light ope
 G | Green
 Y | Yellow
 R | Red
+W | Change Warning - UK Style
 
 ### Modes
 
@@ -34,6 +35,7 @@ O | Off - Lights turned off
 A | Automatic - Timings are automatic between 10 and 90 seconds
 M | Manual - Light stays fixed on current state
 F | Flashing - Light flashes at 1hz
+P | Pairing - Pair with another stoplight and coordinate patterns.
 
 # MQTT Operation
 
@@ -91,10 +93,10 @@ Note: Sending a empty message of this type to the device will result in a popula
 
 |Tags|Description|
 |--|--|
-m|Mode (O = Off, A = Automatic, M = Manual, F = Flashing)
-t|Temperature (degrees celsius)
+m|Mode (O = Off, A = Automatic, M = Manual, F = Flashing, P = Pairing)
+t|CPU Temperature (degrees celsius)
 s|State (G = Green, Y = Yellow, R = Red)
-x| Expires or Delay before state change (how long will it be in this state if on Auto)
+x|Expires or Delay before state change (how long will it be in this state if on Auto)
 
 ### Examples: 
 ```
@@ -116,13 +118,13 @@ Note: Sending a empty message of this type to the device will result in a popula
 g|Hex code for green bottom light
 y|Hex code for yellow/amber middle light
 r|Hex code for red top light
-yd|Yellow light delay (miliseconds)
+d|change light delay (miliseconds)
 w|Change warning enabled (0 = disabled, 1 = enabled)
 
 
 ### Examples: 
 ```
-$801845240|c|g:0x00ff00|y:0xffff00|r:0xff0000|yd:3500|w:0*17
+$801845240|c|g:0x00ff00|y:0xffff00|r:0xff0000|d:3500|w:0*17
 ```
 
 
