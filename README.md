@@ -14,7 +14,7 @@ Visit:
 
 ## Operation
 
-When device is plugged in it will automatically assume a standard stop light operating mode which randomly picks a 10-90 second delay before changing.  The yellow light is the standard delay for a 35mph road in the United States.
+When device is plugged in it will automatically assume a standard stop light operating mode which randomly picks a 10-90 second delay before changing.  The yellow light is the standard delay for a 35mph road in the United States.  Holding down the top button while the device is powered on will turn on pairing mode and the device will look for another device's advertising beacon.
 
 ### States
 
