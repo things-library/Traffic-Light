@@ -25,7 +25,7 @@ The order of the states is: G -> Y -> R -> W -> G.  If change warning is not ena
 G | Green
 Y | Yellow
 R | Red
-W | Change Warning - UK Style
+W | Change Warning - [UK Style: Red and Amber](https://www.gov.uk/guidance/the-highway-code/light-signals-controlling-traffic)
 
 ### Modes
 
