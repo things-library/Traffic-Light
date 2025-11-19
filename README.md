@@ -21,7 +21,7 @@ The order of the states is: G -> Y -> R -> W -> G.  If change warning is not ena
 ### States
 
 | State | Name |
-| -- | -- |
+| :--: | -- |
 G | Green
 Y | Yellow
 R | Red
@@ -32,7 +32,7 @@ W | Change Warning - [UK Style: Red and Amber](https://www.gov.uk/guidance/the-h
 The mode is how the device operates its lights.  Autometical will automatically pick random timings between Green and Red.  Flashing will flash the current light.
 
 | Mode | Name |
-| -- | -- | 
+| :--: | -- | 
 O | Off - Lights turned off
 A | Automatic - Timings are automatic between 10 and 90 seconds
 M | Manual - Light stays fixed on current state
