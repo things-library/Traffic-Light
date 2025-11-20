@@ -97,8 +97,8 @@ Note: Sending a empty message of this type to the device will result in a popula
 |--|--|
 m|Mode (O = Off, A = Automatic, M = Manual, F = Flashing, P = Pairing)
 t|CPU Temperature (degrees celsius)
-s|State (G = Green, Y = Yellow, R = Red)
-x|Expires or Delay before state change (how long will it be in this state if on Auto)
+s|State (G = Green, Y = Yellow, R = Red, W = Change Warning R+Y)
+x|Expires or Delay before state change (how long, in milliseconds, will it be in this state if on Auto)
 
 ### Examples: 
 ```
@@ -120,7 +120,7 @@ Note: Sending a empty message of this type to the device will result in a popula
 g|Hex code for green bottom light
 y|Hex code for yellow/amber middle light
 r|Hex code for red top light
-d|change light delay (miliseconds)
+d|Change warning light delay (milliseconds)
 w|Change warning enabled (0 = disabled, 1 = enabled)
 
 
