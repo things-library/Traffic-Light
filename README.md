@@ -66,7 +66,7 @@ Device Name: Traffic-Light
 Standard BLE UART Service ID: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
 
 | Attrib | ID | Write | Read | Notify |
-| -- | -- | :--: | :--: | :--: |
+| :--: | -- | :--: | :--: | :--: |
 UART RX | 6E400002-B5A3-F393-E0A9-E50E24DCCA9E | [X] | |
 UART TX | 6E400003-B5A3-F393-E0A9-E50E24DCCA9E | | [X] | [X]
 
@@ -87,14 +87,52 @@ CPU Temperature | 0x2a1c | | [X] | [X]
 
 The telemetry data that is transmitted from the BLE UART TX attribute is based on the [Things Library Telemetry](https://schema.thingslibrary.io/telemetry) protocol which is based on GPS data over NMEA 0183.   Telemetry sentences can be converted right into Things Library Telemetry Event objects which is a simple but powerful data structure.
 
-### State Sentences (Send or Receive)
+### Examples:
+
+Typical boot sequence connected to console:
+```
+Starting.... Log Level: 3
+$22859|l|m:BOOTING...BusySignal v0.1.0|l:info*37
+$22864|l|m:Initializing BusySignal...|l:info*05
+$22869|l|m:+ Status LED|l:info*7A
+$22872|l|m:+ Switch|l:info*1B
+$22875|l|m:+ Lights|l:info*03
+$22879|l|m:+ LED Segment (c: (0, 255, 0), start: 0, len: 7)|l:info*67
+$22885|l|m:+ LED Segment (c: (255, 192, 0), start: 7, len: 7)|l:info*69
+$22891|l|m:+ LED Segment (c: (255, 0, 0), start: 14, len: 7)|l:info*54
+$22896|l|m:+ Controller|l:info*1F
+$22900|l|m:+ BLE Service|l:info*1B
+$23128|l|m:Running...|l:info*4C
+$23132|l|m:+ Switch IRQ|l:info*7D
+$23135|l|m:+ Watchdog (timeout=4.5s)|l:info*3C
+$23139|l|m:Loading Settings|l:info*66
+$23150|l|m:+ Applying Custom Settings|l:info*03
+$23160|l|m:+ Warning Duration: Enabled|l:info*29
+$23164|l|m:- Change Warning: False|l:info*2B
+$23174|c|g:#007F5C|y:#FFC000|r:#FF0000|w:false|d:3500*39
+$23183|l|m:+ Applying Custom Settings|l:info*0D
+$23195|s|m:O|x:0|s:G|t:23*18
+$23201|l|m:+ Mode: OFF|l:info*50
+$23209|s|m:O|x:0|s:G|t:23*1E
+$23215|s|m:O|x:-1|s:G|t:23*3F
+$23226|s|m:A|x:30290|s:G|t:23*15
+$23232|l|m:+ Async Tasks: Starting|l:info*24
+$23237|l|m:+ BLE Advertise: Started|l:info*5C
+$23245|l|m:+ BLE UART Wait: Started|l:info*0F
+$31256|i|fw:1.25.0.|id:e4b323fffeb5|cpu:160000000|ver:0.1.0|n:BusySignal*6D
+$53568|s|m:A|x:3500|s:Y|t:24*38
+$57099|s|m:A|x:74414|s:R|t:24*08
+```
+
+
+## State Sentences (Send or Receive)
 
 State sentences describe the current state of the device when receiving from the device.  When sending a state sentence to the device it tell the device what the desired state should be.
 
 Note: Sending a empty message of this type to the device will result in a populated sentence in response.
 
 |Tags|Description|
-|--|--|
+|:--:|--|
 m|Mode (O = Off, A = Automatic, M = Manual, F = Flashing, P = Pairing)
 t|CPU Temperature (degrees celsius)
 s|State (G = Green, Y = Yellow, R = Red, W = Change Warning R+Y)
@@ -116,7 +154,7 @@ Change Warning is similar to how a UK traffic light will turn on red and amber a
 Note: Sending a empty message of this type to the device will result in a populated sentence in response.
 
 |Tags|Description|
-|--|--|
+|:--:|--|
 g|Hex code for green bottom light
 y|Hex code for yellow/amber middle light
 r|Hex code for red top light
@@ -129,5 +167,32 @@ w|Change warning enabled (0 = disabled, 1 = enabled)
 $801845240|c|g:0x00ff00|y:0xffff00|r:0xff0000|d:3500|w:0*17
 ```
 
+## Log Sentence 
 
+Log sentences are only seen when connected to the console 
+
+|Tags|Description|
+|:--:|--|
+m|Log Message
+l|Level (D = debug, I = info, W = warn, E = error)
+
+### Examples:
+```
+Starting.... Log Level: 3
+$22859|l|m:BOOTING...BusySignal v0.1.0|l:info*37
+$22864|l|m:Initializing BusySignal...|l:info*05
+$22869|l|m:+ Status LED|l:info*7A
+$22872|l|m:+ Switch|l:info*1B
+$22875|l|m:+ Lights|l:info*03
+$22879|l|m:+ LED Segment (c: (0, 255, 0), start: 0, len: 7)|l:info*67
+$22885|l|m:+ LED Segment (c: (255, 192, 0), start: 7, len: 7)|l:info*69
+$22891|l|m:+ LED Segment (c: (255, 0, 0), start: 14, len: 7)|l:info*54
+$22896|l|m:+ Controller|l:info*1F
+$22900|l|m:+ BLE Service|l:info*1B
+$23128|l|m:Running...|l:info*4C
+$23132|l|m:+ Switch IRQ|l:info*7D
+$23135|l|m:+ Watchdog (timeout=4.5s)|l:info*3C
+$23139|l|m:Loading Settings|l:info*66
+$23150|l|m:+ Applying Custom Settings|l:info*03
+```
 
