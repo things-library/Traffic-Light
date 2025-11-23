@@ -25,6 +25,7 @@
         .dot {
             height: 30px;
             width: 30px;
+            line-height: 30px;
             background-color: #bbb;
             border-radius: 50%;
             display: inline-block;
@@ -41,9 +42,10 @@
             cursor: pointer;
         }
 
-        #ledGreen.on { background-color: green; }
-        #ledYellow.on { background-color: yellow; }
-        #ledRed.on { background-color: red; }
+        .dot.off {
+            background-color: #333 !important;
+        }
+
     </style>
 
 </head>
@@ -74,9 +76,10 @@
         <div class="card-body"> 
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Control</button>
-                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Info</button>                    
-                    <button class="nav-link" id="nav-telem-tab" data-bs-toggle="tab" data-bs-target="#nav-telem" type="button" role="tab" aria-controls="nav-telem" aria-selected="false">Telemetry</button>                    
+                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="bi bi-dpad"></i></button>
+                    <button class="nav-link" id="nav-config-tab" data-bs-toggle="tab" data-bs-target="#nav-config" type="button" role="tab" aria-controls="nav-home" aria-selected="true"><i class="bi bi-gear-fill"></i></button>
+                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="bi bi-question-circle-fill"></i></button>                    
+                    <button class="nav-link" id="nav-telem-tab" data-bs-toggle="tab" data-bs-target="#nav-telem" type="button" role="tab" aria-controls="nav-telem" aria-selected="false"><i class="bi bi-activity"></i></button>                    
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -90,7 +93,7 @@
                             </tr>
                         </thead>
                         <tr>                            
-                            <td class="bg_black"><span id="ledRed" class="dot"></span></td>
+                            <td class="bg_black"><span id="ledRed" class="dot" style="background-color: #ff0000;"></span></td>
                             <td rowspan="3"></td>
                             <td rowspan="3">
                                 <div class="form-check">
@@ -108,24 +111,21 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="rdoMode" id="rdoFlashing">
                                     <label class="form-check-label" for="rdoFlashing">Flashing</label>
+                                </div>  
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rdoMode" id="rdoPairing">
+                                    <label class="form-check-label" for="rdoPairing">Pairing</label>
                                 </div>   
                             </td>
                         </tr>
                         <tr>                            
-                            <td class="bg_black"><span id="ledYellow" class="dot"></span></td>                            
+                            <td class="bg_black"><span id="ledYellow" class="dot" style="background-color: #ffff00;"></span></td>                            
                         </tr>
                         <tr>                            
-                            <td class="bg_black"><span id="ledGreen" class="dot"></span></td>                                                        
-                        </tr>                        
-                    </table>
-
-                    <dl>
-                        <dt>Status:</dt>
-                        <dd><span id="lblState"></span></dd>
-
-                        <dt>Updated:</dt>
-                        <dd><span id="lblUpdated"></span></dd>
-                    </dl>
+                            <td class="bg_black"><span id="ledGreen" class="dot" style="background-color: #00ff00;"></span></td>                                                        
+                        </tr>                                                
+                    </table>  
+                    <p id="lblExpires" style="font-size: 0.7rem"></p>                     
                 </div>
                 <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                     <dl>
@@ -141,18 +141,57 @@
                         <dt>Firmware</dt>
                         <dd id="lblFirmware"></dd>
                         
-                        <!-- <dt>Temperature</dt>
-                        <dd id="lblTemp"></dd> -->
+                        <dt>CPU Temperature</dt>
+                        <dd id="lblCpuTemp"></dd>
                     </dl>  
-                    
-                    <button id="btnRefresh" type="button" class="btn btn-primary" onclick="refresh_info()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+
+                    <button id="btnRefresh" type="button" class="btn btn-primary btn-sm" onclick="refresh_info()"><i class="bi bi-arrow-clockwise"></i></button>
                 </div> 
+                <div class="tab-pane fade" id="nav-config" role="tabpanel" aria-labelledby="nav-config-tab">
+                    <table class="table"> 
+                        <thead>
+                            <tr>                                
+                                <td style="width: 50px;">Color</td>
+                                <td style="width: 10px;"></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tr>                            
+                            <td class="bg_black"><input type="color" class="form-control form-control-color" id="redColor" value="#ff0000" title="Red Light Color"></td>
+                            <td rowspan="3"></td>
+                            <td rowspan="3">         
+                                <div class="form-group">
+                                    <label for="exampleNumberInput">Warning Delay</label>
+                                    <div class="input-group mb-2">                                        
+                                        <input type="text" class="form-control" id="warningDelay" placeholder="" value="3500" style="max-width: 4em">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text">ms</div>
+                                        </div>
+                                    </div>
+                                </div>   
+                                <div class="form-group mt-3">
+                                    <label class="form-check-label" for="chkChangeWarning">Change Warning</label>
+                                    <div class="form-group form-switch">
+                                        <input class="form-check-input" type="checkbox" id="changeWarningEnabled">                                        
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>                            
+                            <td class="bg_black"><input type="color" class="form-control form-control-color" id="yellowColor" value="#ffff00" title="Yellow Light Color"></td>                            
+                        </tr>
+                        <tr>                            
+                            <td class="bg_black"><input type="color" class="form-control form-control-color" id="greenColor" value="#00ff00" title="Green Light Color"></td>                                                        
+                        </tr>                        
+                    </table>
+                
+                </div>
                 <div class="tab-pane fade" id="nav-telem" role="tabpanel" aria-labelledby="nav-telem-tab">                    
-                    <textarea id="txtConsole" readonly style="width: 100%; height: 300px; margin-top: 10px;"></textarea>
+                    <textarea id="txtConsole" readonly style="width: 100%; height: 300px; margin-top: 10px; overflow: auto; white-space: pre;"></textarea>
                     <div class="input-group mb-3">
                         <span class="input-group-text">${ts}</span>
                         <input id="txtSentence" type="text" class="form-control" placeholder="" aria-label="Sentence" aria-describedby="btnSend">
-                        <button id="btnSend" type="button" class="btn btn-outline-primary">Send</button>
+                        <button id="btnSend" type="button" class="btn btn-outline-primary"><i class="bi bi-send"></i></button>
                     </div>
                 </div>               
             </div>
@@ -161,11 +200,6 @@
 
     <script src="things.js"></script>
     <script>
-        // DOM Elements                
-        const bleStateContainer = document.getElementById('lblState');
-        const timestampContainer = document.getElementById('lblUpdated');
-        
-
         //Define BLE Device Specs
         var deviceName ='BusySignal';
         var service_id = '0000180a-0000-1000-8000-00805f9b34fb';
@@ -181,6 +215,8 @@
         var bleService;
         var rx_attrib;
         var tx_attrib;
+
+        var expiresAt = null;
 
         // CONSOLE
         const txtConsole = document.getElementById('txtConsole');
@@ -202,28 +238,66 @@
 
         // STATES
         var ledGreen = document.getElementById('ledGreen');
-        ledGreen.addEventListener('click', (event) => {  state_send('G') }); 
+        ledGreen.addEventListener('click', (event) => {  send('s|s:G|m:M') }); 
         
         var ledYellow = document.getElementById('ledYellow');
-        ledYellow.addEventListener('click', (event) => { state_send('Y') });                
+        ledYellow.addEventListener('click', (event) => { send('s|s:Y|m:M') });                
         
         var ledRed = document.getElementById('ledRed');
-        ledRed.addEventListener('click', (event) => { state_send('R') });
-
+        ledRed.addEventListener('click', (event) => { send('s|s:R|m:M') });
+        
         // MODES
         var rdoOff = document.getElementById('rdoOff');
-        rdoOff.addEventListener('click', (event) => { mode_send('O') });
+        rdoOff.addEventListener('click', (event) => {  send('s|m:O') });
         
         var rdoAuto = document.getElementById('rdoAuto');
-        rdoAuto.addEventListener('click', (event) => { mode_send('A') });
+        rdoAuto.addEventListener('click', (event) => { send('s|m:A') });
         
         var rdoManual = document.getElementById('rdoManual');
-        rdoManual.addEventListener('click', (event) => { mode_send('M') });
+        rdoManual.addEventListener('click', (event) => { send('s|m:M') });
         
         var rdoFlashing = document.getElementById('rdoFlashing');
-        rdoFlashing.addEventListener('click', (event) => { mode_send('F') });
+        rdoFlashing.addEventListener('click', (event) => { send('s|m:F') });
         
-        
+        var rdoPairing = document.getElementById('rdoPairing');
+        rdoPairing.addEventListener('click', (event) => { send('s|m:P') });
+
+        // CONFIG
+        var redColor = document.getElementById('redColor');
+        redColor.addEventListener('change', (event) => 
+        {
+            // if we aren't showing the color we are changing then change to it and set manual mode
+            sentence = `${get_sentence('s|s:R|m:M')}\n${get_sentence('c|r:' + redColor.value)}`;
+            
+            uart_send(sentence);
+        });
+
+        var yellowColor = document.getElementById('yellowColor');
+        yellowColor.addEventListener('change', (event) => 
+        { 
+            sentence = `${get_sentence('s|s:Y|m:M')}\n${get_sentence('c|y:' + yellowColor.value)}`;
+            
+            uart_send(sentence);
+        });
+
+        var greenColor = document.getElementById('greenColor');
+        greenColor.addEventListener('change', (event) => 
+        { 
+            sentence = `${get_sentence('s|s:G|m:M')}\n${get_sentence('c|g:' + greenColor.value)}`;
+           
+            uart_send(sentence);
+        });
+
+        var warningDelay = document.getElementById('warningDelay');
+        warningDelay.addEventListener('change', (event) => { send('c|d:' + warningDelay.value) });
+
+        var changeWarningEnabled = document.getElementById('changeWarningEnabled');
+        changeWarningEnabled.addEventListener('change', (event) => { 
+            value = changeWarningEnabled.checked ? '1' : '0';
+            send('c|w:' + value) 
+        });
+
+
         // Connect Button (search for BLE Devices only if BLE is available)
         btnConnect.addEventListener('click', (event) => {
             if (isWebBluetoothEnabled()){
@@ -237,12 +311,13 @@
             if (!navigator.bluetooth) 
             {
                 console.log("Web Bluetooth API is not available in this browser!");
-                bleStateContainer.innerHTML = "Web Bluetooth API is not available in this browser!";
                 return false
             }
-
-            console.log('Web Bluetooth API supported in this browser.');
-            return true
+            else
+            {
+                console.log('Web Bluetooth supported.');
+                return true
+            }            
         }
 
         // Connect to BLE Device and Enable Notifications
@@ -337,24 +412,29 @@
             if(value == undefined){ return }
 
             if(value == 'G'){ // GREEN
-                ledGreen.classList.add('on')
-                ledYellow.classList.remove('on')
-                ledRed.classList.remove('on')
+                ledGreen.classList.remove('off')
+                ledYellow.classList.add('off')
+                ledRed.classList.add('off')
             }
             else if (value == 'Y'){   //YELLOW
-                ledGreen.classList.remove('on')
-                ledYellow.classList.add('on')
-                ledRed.classList.remove('on')
+                ledGreen.classList.add('off')
+                ledYellow.classList.remove('off')
+                ledRed.classList.add('off')
             }
             else if (value == 'R'){   //RED
-                ledGreen.classList.remove('on')
-                ledYellow.classList.remove('on')
-                ledRed.classList.add('on')
+                ledGreen.classList.add('off')
+                ledYellow.classList.add('off')
+                ledRed.classList.remove('off')
+            }
+            else if (value == 'W'){   //CCHANGE WARNING (RED+YELLOW)
+                ledGreen.classList.add('off')
+                ledYellow.classList.remove('off')
+                ledRed.classList.remove('off')
             }
             else{
-                ledGreen.classList.remove('on')
-                ledYellow.classList.remove('on')
-                ledRed.classList.remove('on')
+                ledGreen.classList.add('off')
+                ledYellow.classList.add('off')
+                ledRed.classList.add('off')
             }
         } 
 
@@ -369,7 +449,7 @@
             
             log_append(`[SENT] ${value}`)
 
-            tx_attrib.writeValue(new TextEncoder().encode(value))
+            tx_attrib.writeValue(new TextEncoder().encode(value + '\n'))
             .then(() => {
                 console.log("UART Sent: ", value);                
             })
@@ -381,20 +461,151 @@
         function uart_received(event)
         {            
             value = new TextDecoder().decode(event.target.value);
-            console.log("UART Received: ", value);
             
+            console.log("UART Received: ", value);
+            log_append(value)            
+                        
             msg = TelemetryEvent.parse(value)
-            console.log(msg)
+            if(msg == null){ 
+                console.error("Invalid telemetry message received: ", value);
+                console.log('[INVALID] ${value}')
+                return; 
+            }
 
-            if('s' in msg.tags) {
+            //console.log(msg)
+            process_telemetry(msg);                       
+        }
+
+        function process_telemetry(msg) 
+        {
+               //STATE
+            if(msg.type == 's')
+            {
+                process_state(msg)
+            }
+            else if(msg.type == 'c')    //CONFIG
+            {
+                process_config(msg)
+            } 
+            else if(msg.type == "i")
+            {
+                process_identity(msg)
+            }
+            else
+            {
+                console.warn("Unknown telemetry type received: ", msg.type)
+            }
+        }
+
+        function process_state(msg)
+        {
+            if('s' in msg.tags) 
+            {
                 state_show(msg.tags['s'])
             }
-            if('m' in msg.tags) {
+            
+            if('m' in msg.tags) 
+            {
                 mode_show(msg.tags['m'])
             }
+            
+            if('x' in msg.tags) 
+            {
+                // x tag is milliseconds until the state expires
+                expiresAt = Date.now() + (parseInt(msg.tags['x']));                
+            }
 
-            log_append(value)
-            timestampContainer.innerHTML = getDateTime();
+            if('t' in msg.tags) 
+            {
+                degreesF = (parseInt(msg.tags['t']) * 9/5) + 32
+                document.getElementById('lblCpuTemp').innerText = `${degreesF}f (${msg.tags['t']}c)`
+            }
+        }   
+
+        
+        // Start the countdown clock timer (updates every 100ms)
+        setInterval(countdownClock, 100);
+
+        function countdownClock(){
+            if(expiresAt == null){ 
+                document.getElementById('lblExpires').innerText = ''
+                return; 
+            }
+
+            var diff = Math.floor((expiresAt - Date.now()) / 1000);
+            if( diff > 0)
+            {
+                if(!ledGreen.classList.contains('off'))
+                {
+                    ledGreen.innerText = diff;
+                    ledYellow.innerText = ''
+                    ledRed.innerText = ''
+                }
+                else if(!ledYellow.classList.contains('off'))
+                {
+                    ledGreen.innerText  = ''
+                    ledYellow.innerText = diff;
+                    ledRed.innerText = ''
+                }                
+                else if(!ledRed.classList.contains('off'))
+                {
+                    ledGreen.innerText = ''
+                    ledYellow.innerText = ''
+                    ledRed.innerText = diff;
+                }                
+            }
+            else
+            {
+                ledGreen.innerText = ''
+                ledYellow.innerText = ''
+                ledRed.innerText = ''
+            }
+        }
+
+        function process_config(msg)
+        {
+            ///Sentence: $38809|c|g:#007F5C|y:#FFC000|r:#FF0000|w:1|d:3400*7D
+
+            // g|Hex code for green bottom light
+            // y|Hex code for yellow/amber middle light
+            // r|Hex code for red top light
+            // d|Change warning light delay (milliseconds)
+            // w|Change warning enabled (0 = disabled, 1 = enabled)
+            
+            if('g' in msg.tags) 
+            {
+                document.getElementById('greenColor').value = msg.tags['g'];
+                ledGreen.style.backgroundColor = msg.tags['g'];
+            }
+            
+            if('y' in msg.tags) 
+            {
+                document.getElementById('yellowColor').value = msg.tags['y'];
+                ledYellow.style.backgroundColor = msg.tags['y'];
+            }
+            
+            if('r' in msg.tags) 
+            {
+                document.getElementById('redColor').value = msg.tags['r'];
+                ledRed.style.backgroundColor = msg.tags['r'];
+            }
+
+            if('d' in msg.tags) 
+            {
+                document.getElementById('warningDelay').value = msg.tags['d'];
+            }
+            
+            if('w' in msg.tags) 
+            {
+                document.getElementById('changeWarningEnabled').checked = (msg.tags['w'] == '1');
+            }
+        }
+
+        function process_identity(msg)
+        {
+            // $8505|i|fw:1.25.0.|id:e4b323fffeb5|cpu:160000000|ver:0.1.0|n:BusySignal*56
+
+            // TO DO
         }
 
         var maxEvents = 200;
@@ -412,8 +623,7 @@
             }
         }
 
-
-        function state_send(value)
+        function state_send(state, mode)
         {
             if (!bleServer || !bleServer.connected) 
             {
@@ -422,10 +632,39 @@
                 return;
             }
 
-            msg = new TelemetryEvent(type='s') 
-            msg.tags['s'] = value
+            msg = new TelemetryEvent(type='s', date=Date.now()); 
+            if (state) {
+                msg.tags['s'] = state;
+            }
+            if (mode) {
+                msg.tags['m'] = mode;
+            }   
 
-            uart_send(msg.sentence())
+            uart_send(msg.sentence());
+        }
+
+        function get_sentence(partialSentence)
+        {
+            parts = partialSentence.split('|');
+            if(parts[0].charAt(0) != '$') { partialSentence = `$${Date.now()}|${partialSentence}` }
+            
+            sentence = TelemetryEvent.appendChecksum(partialSentence);
+
+            return sentence;
+        }
+
+        function send(partialSentence) 
+        {
+            if (!bleServer || !bleServer.connected) 
+            {
+                console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+                window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+                return;
+            }
+
+            sentence = get_sentence(partialSentence);
+            
+            uart_send(sentence);
         }
 
         function sendMessage() 
@@ -433,7 +672,7 @@
             sentence = txtSentence.value;
             if(sentence.charAt(0) != '$') { sentence = `$${Date.now()}|${sentence}` }
             
-            sentence = ThingItem.appendChecksum(sentence);
+            sentence = TelemetryEvent.appendChecksum(sentence);
 
             uart_send(sentence);
 
@@ -463,37 +702,27 @@
             {
                 this.rdoFlashing.checked = true
             }
+            else if (value == 'P')
+            {
+                this.rdoPairing.checked = true
+            }
             else 
             {
                 this.rdoOff.checked = false
                 this.rdoAuto.checked = false
                 this.rdoManual.checked = false
                 this.rdoFlashing.checked = false
+                this.rdoPairing.checked = false
             }
         }
 
-        function mode_send(value)
-        {
-            if (!bleServer || !bleServer.connected) 
-            {
-                console.error ("Bluetooth is not connected. Cannot write to characteristic.");
-                window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!");
-                return;
-            }
-            
-            msg = new TelemetryEvent(type='s');
-            msg.tags['m'] = value;
-             
-            uart_send(msg.sentence());            
-        }
 
         function mode_changed(event)
         {     
             value = new TextDecoder().decode(event.target.value);
             console.log("Mode changed: ", value);
             
-            mode_show(value);
-            timestampContainer.innerHTML = getDateTime();
+            mode_show(value);            
         }
 
         // --------------------------------------------------------------------------------
@@ -501,10 +730,7 @@
         function temp_changed(event)
         {        
             value = new TextDecoder().decode(event.target.value);
-            console.log("Temp changed: ", value);
-                    
-            //temp_show(value)
-            timestampContainer.innerHTML = getDateTime();
+            console.log("Temp changed: ", value);                    
         }
         
 
@@ -514,17 +740,11 @@
             {
                 btnConnect.classList.add("d-none");
                 btnDisconnect.classList.remove("d-none");
-
-                bleStateContainer.innerHTML = 'Connected';
-                bleStateContainer.style.color = "#24af37";
             }
             else
             {
                 btnConnect.classList.remove("d-none");
                 btnDisconnect.classList.add("d-none");
-                
-                bleStateContainer.innerHTML = "Disconnected";
-                bleStateContainer.style.color = "#d13a30";
             }
         }
 
