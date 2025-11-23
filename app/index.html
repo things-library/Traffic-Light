@@ -616,26 +616,6 @@
             }
         }
 
-        function state_send(state, mode)
-        {
-            if (!bleServer || !bleServer.connected) 
-            {
-                console.error ("Bluetooth is not connected. Cannot write to characteristic.")
-                window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
-                return;
-            }
-
-            msg = new TelemetryEvent(type='s', date=Date.now()); 
-            if (state) {
-                msg.tags['s'] = state;
-            }
-            if (mode) {
-                msg.tags['m'] = mode;
-            }   
-
-            uart_send(msg.sentence());
-        }
-
         function get_sentence(partialSentence)
         {
             parts = partialSentence.split('|');
@@ -704,24 +684,6 @@
             }
         }
 
-
-        function mode_changed(event)
-        {     
-            value = new TextDecoder().decode(event.target.value);
-            console.log("Mode changed: ", value);
-            
-            mode_show(value);            
-        }
-
-        // --------------------------------------------------------------------------------
-        // TEMPERATURE METHODS
-        function temp_changed(event)
-        {        
-            value = new TextDecoder().decode(event.target.value);
-            console.log("Temp changed: ", value);                    
-        }
-        
-
         function connection_show(isConnected) 
         {
             if(isConnected)
@@ -762,19 +724,6 @@
             connection_show(false)
         }
 
-        function getDateTime() 
-    {
-        var currentdate = new Date();
-        var day = ("00" + currentdate.getDate()).slice(-2); // Convert day to string and slice
-        var month = ("00" + (currentdate.getMonth() + 1)).slice(-2);
-        var year = currentdate.getFullYear();
-        var hours = ("00" + currentdate.getHours()).slice(-2);
-        var minutes = ("00" + currentdate.getMinutes()).slice(-2);
-        var seconds = ("00" + currentdate.getSeconds()).slice(-2);
-
-        var datetime = year + '-' + month + '-' + day + " " + hours + ":" + minutes + ":" + seconds;
-        return datetime;
-    }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
