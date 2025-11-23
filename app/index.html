@@ -111,10 +111,6 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="rdoMode" id="rdoFlashing">
                                     <label class="form-check-label" for="rdoFlashing">Flashing</label>
-                                </div>  
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="rdoMode" id="rdoPairing">
-                                    <label class="form-check-label" for="rdoPairing">Pairing</label>
                                 </div>   
                             </td>
                         </tr>
@@ -258,9 +254,6 @@
         
         var rdoFlashing = document.getElementById('rdoFlashing');
         rdoFlashing.addEventListener('click', (event) => { send('s|m:F') });
-        
-        var rdoPairing = document.getElementById('rdoPairing');
-        rdoPairing.addEventListener('click', (event) => { send('s|m:P') });
 
         // CONFIG
         var redColor = document.getElementById('redColor');
@@ -701,18 +694,13 @@
             else if (value == 'F')
             {
                 this.rdoFlashing.checked = true
-            }
-            else if (value == 'P')
-            {
-                this.rdoPairing.checked = true
-            }
+            }            
             else 
             {
                 this.rdoOff.checked = false
                 this.rdoAuto.checked = false
                 this.rdoManual.checked = false
-                this.rdoFlashing.checked = false
-                this.rdoPairing.checked = false
+                this.rdoFlashing.checked = false                
             }
         }
 
